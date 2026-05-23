@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 
+// Albums group multiple music records under one artist.
 const albumSchema = new mongoose.Schema({
     title: {
         type: String,

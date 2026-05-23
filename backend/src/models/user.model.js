@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 
+// Users can sign in as listeners or artists.
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -21,7 +22,6 @@ const userSchema = new mongoose.Schema({
         enum: [ 'user', 'artist' ],
         default: 'user',
     }
-
 })
 
 

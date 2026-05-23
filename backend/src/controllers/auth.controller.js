@@ -4,9 +4,9 @@ const bcrypt = require("bcryptjs");
 
 
 async function registerUser(req, res) {
-
     const { username, email, password, role = "user" } = req.body;
 
+    // Prevent duplicate accounts by username or email.
     const isUserAlreadyExists = await userModel.findOne({
         $or: [
             { username },
@@ -18,6 +18,7 @@ async function registerUser(req, res) {
         return res.status(409).json({ message: "User already exists" })
     }
 
+    // Never store the raw password in the database.
     const hash = await bcrypt.hash(password, 10)
 
     const user = await userModel.create({
@@ -27,6 +28,7 @@ async function registerUser(req, res) {
         role
     })
 
+    // Encode only the data needed by downstream auth middleware.
     const token = jwt.sign({
         id: user._id,
         role: user.role,
@@ -50,10 +52,9 @@ async function registerUser(req, res) {
 
 
 async function loginUser(req, res) {
-
     const { username, email, password } = req.body;
 
-
+    // Allow login with either username or email.
     const user = await userModel.findOne({
         $or: [
             { username },
@@ -65,14 +66,14 @@ async function loginUser(req, res) {
         return res.status(401).json({ message: "Invalid credentials" })
     }
 
-
+    // Compare the provided password with the stored hash.
     const isPasswordValid = await bcrypt.compare(password, user.password)
-
 
     if (!isPasswordValid) {
         return res.status(401).json({ message: "Invalid credentials" })
     }
 
+    // Re-issue the auth cookie after a successful login.
     const token = jwt.sign({
         id: user._id,
         role: user.role,
@@ -90,13 +91,10 @@ async function loginUser(req, res) {
             role: user.role,
         }
     })
-
-
-
-
 }
 
 async function logoutUser(req, res) {
+    // Clearing the cookie logs the current browser session out.
     res.clearCookie("token")
     res.status(200).json({ message: "User logged out successfully" })
 }

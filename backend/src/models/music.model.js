@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 
+// Each music document stores the uploaded file URL and its owner.
 const musicSchema = new mongoose.Schema({
     uri: {
         type: String,

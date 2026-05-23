@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 
 
 async function authArtist(req, res, next) {
-
+    // Artists are the only users allowed to create music and albums.
     const token = req.cookies.token;
 
     if (!token) {
@@ -10,7 +10,6 @@ async function authArtist(req, res, next) {
     }
 
     try {
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         if (decoded.role !== "artist") {
@@ -20,7 +19,6 @@ async function authArtist(req, res, next) {
         req.user = decoded;
 
         next()
-
     }
     catch (err) {
         console.log(err);
@@ -30,7 +28,7 @@ async function authArtist(req, res, next) {
 }
 
 async function authUser(req, res, next) {
-
+    // Regular users can read the published music catalog.
     const token = req.cookies.token;
 
     if (!token) {
@@ -38,7 +36,6 @@ async function authUser(req, res, next) {
     }
 
     try {
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         if (decoded.role !== "user") {
@@ -48,8 +45,6 @@ async function authUser(req, res, next) {
         req.user = decoded;
 
         next()
-
-
     } catch (err) {
         console.log(err);
         return res.status(401).json({ message: "Unauthorized" })
